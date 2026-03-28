@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "types": ["node"],
+
+    "sourceMap": true,
+
+    "strict": true,
+    "esModuleInterop": true,
+
+    "skipLibCheck": true
+  }
+}
