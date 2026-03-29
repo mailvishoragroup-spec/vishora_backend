@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/error.middleware";
 import adminRoutes from "./routes/admin.routes";
 import propertyRoutes from "./routes/property.routes";
 import inquiryRoutes from "./routes/inquiry.routes";
+import dbConnection from "./config/db";
 
 const app = express();
 
@@ -21,6 +22,11 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+
+app.use(async (req, res, next) => {
+  await dbConnection();
+  next();
+});
 // 🔍 Logger (debugging)
 app.use((req, res, next) => {
   console.log(`HIT: ${req.method} ${req.url}`);
