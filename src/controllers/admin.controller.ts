@@ -52,9 +52,9 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   const token = generateToken(admin._id.toString());
 
   res.cookie("token", token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+     httpOnly: true,
+  secure: true,       // 🔥 required on HTTPS (Vercel)
+  sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
