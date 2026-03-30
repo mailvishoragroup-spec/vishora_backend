@@ -4,7 +4,6 @@ import Admin from "../models/Admin.model";
 import { Request, Response, NextFunction } from "express";
 import { generateToken } from "../utils/generateToken";
 
-
 //REGISTER ROUTE
 
 export const registerAdmin = asyncHandler(
@@ -29,7 +28,6 @@ export const registerAdmin = asyncHandler(
   },
 );
 
-
 //LOGIN ROUTE
 
 export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -52,9 +50,9 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   const token = generateToken(admin._id.toString());
 
   res.cookie("token", token, {
-     httpOnly: true,
-  secure: true,       // 🔥 required on HTTPS (Vercel)
-  sameSite: "none",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // 🔥 key fix
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -68,13 +66,11 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
       role: admin.role,
     },
   });
-  
 });
-
 
 // UPDATE ROUTE
 
-export const updateAdmin = asyncHandler(async (req:Request, res:Response) => {
+export const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, email, role, isActive } = req.body;
 
@@ -124,10 +120,9 @@ export const updateAdmin = asyncHandler(async (req:Request, res:Response) => {
   });
 });
 
-
 // DELETE ROUTE
 
-export const deleteAdmin = asyncHandler(async (req:Request, res:Response) => {
+export const deleteAdmin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const loggedInAdmin = req.admin;
@@ -147,7 +142,6 @@ export const deleteAdmin = asyncHandler(async (req:Request, res:Response) => {
     throw new ApiError(404, "Admin not found");
   }
 
-
   admin.isActive = false;
   await admin.save();
 
@@ -156,7 +150,6 @@ export const deleteAdmin = asyncHandler(async (req:Request, res:Response) => {
     message: "Admin deactivated successfully",
   });
 });
-
 
 export const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.clearCookie("token", {
