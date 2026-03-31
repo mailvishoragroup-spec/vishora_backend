@@ -4,6 +4,18 @@ import Admin from "../models/Admin.model";
 import { Request, Response, NextFunction } from "express";
 import { generateToken } from "../utils/generateToken";
 
+
+
+// 🔥 GET CURRENT ADMIN
+export const getAdminProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    res.status(200).json({
+      success: true,
+      admin: req.admin,
+    });
+  }
+);
+
 //REGISTER ROUTE
 
 export const registerAdmin = asyncHandler(

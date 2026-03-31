@@ -3,31 +3,44 @@ import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.model";
 
 // ✅ PROTECT
-export const protect = async (req: any, res: any, next: any) => {
-  try {
-    const token = req.cookies.token;
+interface AuthRequest extends Request {
+  admin?: any;
+}
 
-    console.log("TOKEN:", token); // debug
+export const protect = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.cookies?.token;
+
+    // 🔍 Debug (remove in production)
+    console.log("TOKEN:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
 
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as { id: string };
 
-    console.log("DECODED:", decoded); // debug
+    // console.log("DECODED:", decoded);
 
     const admin = await Admin.findById(decoded.id).select("-password");
 
-    console.log("ADMIN FROM DB:", admin); // debug
+    console.log("ADMIN FROM DB:", admin);
 
     if (!admin) {
       return res.status(401).json({ message: "Admin not found" });
     }
 
-    req.admin = admin; // 🔥 IMPORTANT
+    req.admin = admin;
 
     next();
+
   } catch (error) {
     console.log("PROTECT ERROR:", error);
     return res.status(401).json({ message: "Invalid token" });

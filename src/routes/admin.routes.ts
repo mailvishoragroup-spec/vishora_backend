@@ -7,6 +7,7 @@ import {
   logoutAdmin,
   updateAdmin,
   deleteAdmin,
+  getAdminProfile,
 } from "../controllers/admin.controller";
 import { authorizeRoles, protect } from "../middleware/auth.middleware";
 
@@ -14,6 +15,9 @@ import { authorizeRoles, protect } from "../middleware/auth.middleware";
 
 
 const router = express.Router();
+
+// GET CURRENT ADMIN
+router.get("/me", protect, getAdminProfile);
 
 
 // 🔓 PUBLIC ROUTES
