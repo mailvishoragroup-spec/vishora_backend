@@ -2,15 +2,24 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
 import { sendEmail } from "../utils/sendEmail";
 import { Request, Response, NextFunction } from "express";
+import Inquiry from "../models/Inquiry.model";
 
-export const submitInquiry = asyncHandler(async (req:Request, res:Response) => {
+export const submitInquiry = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, phone, budget, requirement } = req.body;
 
   if (!name || !email || !phone) {
     throw new ApiError(400, "Required fields missing");
   }
 
-  // 📧 Email to YOU (admin)
+  const inquiry = await Inquiry.create({
+    name,
+    email,
+    phone,
+    budget,
+    requirement,
+  });
+
+  // 📧 2. EMAIL TO ADMIN
   await sendEmail(
     process.env.EMAIL_USER!,
     "New Property Inquiry",
@@ -24,7 +33,7 @@ export const submitInquiry = asyncHandler(async (req:Request, res:Response) => {
     `
   );
 
-  // 📧 Auto Reply to USER
+  
   await sendEmail(
     email,
     "Thank You for Your Inquiry 🏠",
@@ -32,7 +41,7 @@ export const submitInquiry = asyncHandler(async (req:Request, res:Response) => {
     <h2>Hi ${name},</h2>
     <p>Thank you for reaching out to <b>Vishora Real Estate</b>.</p>
     <p>We have received your requirement and our team will contact you shortly.</p>
-    
+
     <br/>
     <p><b>Your Details:</b></p>
     <p>Budget: ${budget}</p>
@@ -43,8 +52,20 @@ export const submitInquiry = asyncHandler(async (req:Request, res:Response) => {
     `
   );
 
-  res.status(200).json({
+  res.status(201).json({
     success: true,
     message: "Inquiry submitted successfully",
+    inquiry, // 🔥 return saved data
+  });
+});
+
+
+export const getInquiries = asyncHandler(async (req:Request, res:Response) => {
+  const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    count: inquiries.length,
+    inquiries,
   });
 });
