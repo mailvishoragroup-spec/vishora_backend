@@ -69,3 +69,49 @@ export const getInquiries = asyncHandler(async (req:Request, res:Response) => {
     inquiries,
   });
 });
+
+
+export const deleteInquiry = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const inquiry = await Inquiry.findById(id);
+
+  if (!inquiry) {
+    throw new ApiError(404, "Inquiry not found");
+  }
+
+  await inquiry.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "Inquiry deleted successfully",
+  });
+});
+
+
+export const updateInquiryStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  // ✅ Validate status
+  const validStatus = ["new", "contacted", "closed"];
+
+  if (!validStatus.includes(status)) {
+    throw new ApiError(400, "Invalid status value");
+  }
+
+  const inquiry = await Inquiry.findById(id);
+
+  if (!inquiry) {
+    throw new ApiError(404, "Inquiry not found");
+  }
+
+  inquiry.status = status;
+  await inquiry.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Status updated successfully",
+    inquiry,
+  });
+});
