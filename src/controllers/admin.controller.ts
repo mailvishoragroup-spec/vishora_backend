@@ -3,7 +3,8 @@ import { ApiError } from "../utils/ApiError";
 import Admin from "../models/Admin.model";
 import { Request, Response, NextFunction } from "express";
 import { generateToken } from "../utils/generateToken";
-
+import Property from "../models/Property.model";
+import Inquiry from "../models/Inquiry.model";
 
 
 // 🔥 GET CURRENT ADMIN
@@ -173,5 +174,21 @@ export const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: "Logged out successfully",
+  });
+});
+
+
+export const getDashboardStats = asyncHandler(async (req:Request, res:Response) => {
+  const totalProperties = await Property.countDocuments();
+  const totalLeads = await Inquiry.countDocuments();
+  const hotDeals = await Property.countDocuments({ isHotDeal: true });
+
+  res.status(200).json({
+    success: true,
+    stats: {
+      totalProperties,
+      totalLeads,
+      hotDeals,
+    },
   });
 });

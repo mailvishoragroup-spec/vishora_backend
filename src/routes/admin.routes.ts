@@ -8,21 +8,19 @@ import {
   updateAdmin,
   deleteAdmin,
   getAdminProfile,
+  getDashboardStats,
 } from "../controllers/admin.controller";
 import { authorizeRoles, protect } from "../middleware/auth.middleware";
 
 // Middleware
-
 
 const router = express.Router();
 
 // GET CURRENT ADMIN
 router.get("/me", protect, getAdminProfile);
 
-
 // 🔓 PUBLIC ROUTES
 router.post("/login", loginAdmin);
-
 
 // 🔐 PROTECTED ROUTES
 
@@ -38,19 +36,14 @@ router.get("/profile", protect, (req, res) => {
 });
 
 // Register (only super_admin)
-router.post(
-  "/register",
-  registerAdmin
-);
+router.post("/register", registerAdmin);
 
 // Update (self or super_admin)
 router.put("/update/:id", protect, updateAdmin);
 
 // Delete (only super_admin)
-router.delete(
-  "/delete/:id",
-  deleteAdmin,
-  protect
-);
+router.delete("/delete/:id", deleteAdmin, protect);
+
+router.get("/stats", protect, getDashboardStats);
 
 export default router;
